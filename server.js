@@ -1,9 +1,10 @@
 const express = require("express");
-const morgan = require("morgan");
-const connectDB = require("./config/db");
-const colors = require("colors");
-
 const dotenv = require("dotenv");
+const morgan = require("morgan");
+const colors = require("colors");
+const connectDB = require("./config/db");
+const errorHandler = require("./middlewares/error");
+
 // LOAD ENV VARS
 dotenv.config({ path: "./config/config.env" });
 // Connect to the mangoo database
@@ -25,6 +26,8 @@ if (process.env.NODE_ENV === "development") {
 // App USE
 app.use("/api/v1/bootcamps", bootcamp);
 
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 9000;
 
 const server = app.listen(
@@ -35,8 +38,8 @@ const server = app.listen(
 );
 
 // Handle unhandled promise rejections
-process.on("unhandledRejection", (error) => {
-  console.log(`ERROR :>> ${error.message}`.red);
+process.on("unhandledRejection", (err) => {
+  console.log(`ERROR :>> ${err.message}`.red);
   // Close server and exit process
   server.close(() => process.exit(1));
 });
